@@ -7838,8 +7838,8 @@
       "transactionHash": "0x1ab8cd69c2435c8091f4629296caadcc2aba759b222068d11f7d17e378804023"
     }
   },
-  "schemaVersion": "3.3.4",
-  "updatedAt": "2021-05-12T22:50:09.484Z",
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-06-17T21:51:31.214Z",
   "devdoc": {
     "methods": {}
   },

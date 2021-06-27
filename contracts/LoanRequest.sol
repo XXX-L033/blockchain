@@ -3,7 +3,6 @@ pragma solidity ^0.4.0;
 import "./LoanContract.sol";
 import "./LoanToken.sol";
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
-import "./LiCoin.sol";
 
 contract LoanRequest {
     address public company = 0x9Bd41Db18ed0Bd1AD0747eA709CE74522F44a4c1;
