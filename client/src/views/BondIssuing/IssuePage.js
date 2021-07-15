@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import 'antd/dist/antd.css';
 import '../../index.css';
 
+
 import {
     Checkbox,
     DatePicker,
@@ -17,65 +18,96 @@ import {
     Input,
     Divider
 } from 'antd';
-import {LockOutlined, WalletOutlined, EyeInvisibleOutlined, EyeTwoTone, InfoCircleOutlined} from '@ant-design/icons';
 import getWeb3 from "../../getWeb3";
-import SimpleStorageContract from "../../contracts/LoanContract.json";
+//import LoanContract from "../../contracts/LoanContract";
+import IssueSuccess from "./IssueSuccess";
+import {Route} from "react-router-dom";
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
-const {Option} = Select;
 const {TextArea} = Input;
-const dateFormat = 'YYYY/MM/DD';
+let LoanContract = require('../../contracts/LoanContract.json')
 
-const onFinish = (values) => {
-    //const onFinish = (values) => {
-    console.log('issuer', values);
-    //};
-};
-
-const formItemLayout = {
-
+const formLayout = {
     labelCol: {
-        span: 25
+        xs: { span: 15},
+        sm: { span: 15 },
     },
     wrapperCol: {
-        span: 20
+        xs: { span: 15 },
+        sm: { span: 15 },
     },
 };
 
-const tailLayout = {
-    wrapperCol: {
-        offset: 3,
-        span: 10,
-    },
-};
+const route = {
+    path: `/BondIssuing/IssueSuccess`,
+    component: IssueSuccess,
+}
 
-const buttonLayout = {
-    wrapperCol: {
-        offset: 3,
-        span: 18,
-    },
-};
-
-const checkOptions = [{label:'1 ETH', value:'1'},
-    {label:'5 ETH', value:'5 ETH'},
-    {label:'10 ETH', value:'10'},
-    {label:'20 ETH', value:'20'},
-    {label:'50 ETH', value:'50'},
-    {label:'100 ETH', value:'100'},
-    {label:'200 ETH', value:'200'},
+const checkOptions = [{label: '1 ETH', value: '1'},
+    {label: '5 ETH', value: '5'},
+    {label: '10 ETH', value: '10'},
+    {label: '20 ETH', value: '20'},
+    {label: '50 ETH', value: '50'},
+    {label: '100 ETH', value: '100'},
+    {label: '200 ETH', value: '200'},
 ];
 
-// const [v, setValue] = React.useState(1);
-//
-// const onChange = e => {
-//     setValue(e.target.value);
-// };
+const dataFormat = 'YYYY/MM/DD';
 
+const acc = sessionStorage.getItem('account');
+console.log("account:" + acc);
 
 class IssuePage extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {accounts: null}
+    }
+
+    handle = (values) => {
+        fetch('http://localhost:8888/issue', {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Content-Type': 'application/x-www-form-urlencoded'/* 请求内容类型 */
+            },
+            body: 'message=' + JSON.stringify(values)
+        }).then((response) => {
+            return response.json()
+        }).then((data) => {
+            console.log(data)
+        }).catch(function (error) {
+            console.log(error)
+        })
+        const jumpForm2 = document.createElement('form');
+        document.body.appendChild(jumpForm2);
+        jumpForm2.action = `/BondIssuing/IssueSuccess`;
+        jumpForm2.submit();
+
+        document.body.removeChild(jumpForm2);
+    }
+
+    componentDidMount = async () => {
+        const web3 = await getWeb3();
+
+        const accountValue = await web3.eth.getAccounts();
+
+        this.setState({accountValue}, this.runExample);
+
+        console.log("account:" + accountValue);
+    };
+
+    runExample = async () => {
+        const {accountValue} = this.state;
+
+        // Update state with the result.
+        this.setState({accounts: accountValue});
+    };
+
+    //
 
     render() {
+
         return (
             <Layout>
                 <Layout>
@@ -87,88 +119,74 @@ class IssuePage extends Component {
                             <Divider/>
                             <Title style={{fontWeight: 'bold', fontSize: 15, textAlign: 'left'}}> Fill in the form below
                                 and issue green bond:</Title>
-                            <Card style={{padding: 10, background: '#F5F5F5'}}
-                                  title="Issuer Detail"
+
+                            <Route exact path={route.path} component={route.component}/>
+
+                            <Form
+                                name="bondIssue1"
+                                initialValues={{
+                                    remember: true,
+                                    ["address"]: acc,
+                                }}
+                                onFinish={this.handle.bind(this)}
+                                layout='inline'
                             >
-                                <Form
-                                    name="bondIssue1"
-                                    initialValues={{
-                                        remember: true,
-                                    }}
-                                    onFinish={onFinish}
-                                    layout="inline"
+                                <Card style={{padding: 10, background: '#F5F5F5'}}
+                                      title="Issuer Detail"
                                 >
-                                    <Form.Item
-                                        label="Issuer Type"
-                                        name="type"
-                                        rules={[
-                                            {
-                                                required: true,
-                                            },
-                                        ]}
-                                    >
-                                        <Radio.Group name="issuerT" size="large">
-                                            <Radio value={1}>Company</Radio>
-                                            <Radio value={2}>Government</Radio>
+                                    <Row>
+                                        <Col span={24}>
+                                            <Form.Item
+                                                label="Issuer Type"
+                                                name="type"
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                    },
+                                                ]}
+                                            >
+                                                <Radio.Group name="issuerT" size="large">
+                                                    <Radio value={1}>Company</Radio>
+                                                    <Radio value={2}>Government</Radio>
+                                                </Radio.Group>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={12}>
+                                            <Form.Item
+                                                label="Company Name"
+                                                name="name"
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                    },
+                                                ]}
+                                            >
+                                                <Input/>
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Form.Item
+                                                label="Net Income"
+                                                name="income"
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                    },
+                                                ]}
+                                            >
+                                                <Input/>
+                                            </Form.Item>
+                                        </Col>
 
-                                        </Radio.Group>
-                                    </Form.Item>
-                                </Form>
-                                <div style={{padding: '5px 0px'}}>
-                                    <Form
-                                        name="bondIssue"
-                                        initialValues={{
-                                            remember: true,
-                                        }}
-                                        onFinish={onFinish}
-                                        layout="inline"
-                                    >
-                                        <Row>
-                                            <Col span={12}>
-                                                <Form.Item
-                                                    label="Issuer Name"
-                                                    name="name"
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Input/>
-                                                </Form.Item>
-                                            </Col>
-                                            <Col span={12}>
-                                                <Form.Item
-                                                    label="Net Income"
-                                                    name="name"
-                                                    style={{padding: '0px 10px'}}
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                            message: 'Please input your address!',
-                                                        },
-                                                    ]}
-                                                >
-                                                    <Input
-                                                        prefix="$" suffix="USD"/>
-                                                </Form.Item>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </div>
-                            </Card>
+                                    </Row>
+                                </Card>
 
-                            <Card style={{padding: 10, background: '#F5F5F5'}}
-                                  title="Bond Detail"
-                            >
-                                <Form
-                                    name="bondIssue2"
-                                    initialValues={{
-                                        remember: true,
-                                    }}
-                                    onFinish={onFinish}
-
+                                <Card style={{padding: 10, background: '#F5F5F5'}}
+                                      title="Bond Detail"
                                 >
+
                                     <Row>
                                         <Col span={8}>
                                             <Form.Item
@@ -213,6 +231,24 @@ class IssuePage extends Component {
                                     </Row>
                                     <div>
                                         <Row>
+                                            <Col span={24}>
+                                                <Form.Item
+                                                    style={{padding: '10px 0px'}}
+                                                    label="MetaMask Account"
+                                                    name="address"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Input/>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                    <div>
+                                        <Row>
                                             <Col>
                                                 <Form.Item
                                                     label="Start Date"
@@ -223,10 +259,10 @@ class IssuePage extends Component {
                                                         },
                                                     ]}
                                                 >
-                                                    <DatePicker/>
+                                                    <DatePicker format={dataFormat}/>
                                                 </Form.Item>
                                             </Col>
-                                            <Col push={3}>
+                                            <Col>
                                                 <Form.Item
                                                     label="Maturity Date"
                                                     name="maturityDate"
@@ -236,7 +272,7 @@ class IssuePage extends Component {
                                                         },
                                                     ]}
                                                 >
-                                                    <DatePicker/>
+                                                    <DatePicker format={dataFormat}/>
                                                 </Form.Item>
                                             </Col>
                                             <Col md={6} sm={24}></Col>
@@ -260,7 +296,7 @@ class IssuePage extends Component {
                                         {/*    <Option value="50">50 ETH</Option>*/}
                                         {/*    <Option value="100">100 ETH</Option>*/}
                                         {/*</Select>*/}
-                                        <Checkbox.Group options={checkOptions} />
+                                        <Checkbox.Group options={checkOptions}/>
 
 
                                     </Form.Item>
@@ -276,15 +312,14 @@ class IssuePage extends Component {
                                         <TextArea rows={4}/>
                                     </Form.Item>
 
-                                    <Form.Item>
+                                    <Form.Item
+                                        style={{padding: '10px 0px'}}>
                                         <Button type="primary" htmlType="submit" className="submit-form-button">
                                             Submit
                                         </Button>
-
                                     </Form.Item>
-
-                                </Form>
-                            </Card>
+                                </Card>
+                            </Form>
                         </div>
                     </Content>
                 </Layout>

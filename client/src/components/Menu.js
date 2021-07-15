@@ -21,10 +21,7 @@ class CustomMenu extends React.Component {
     renderMenuItem = ({key, title,}) => {
         return (
             <Menu.Item key={key}>
-                {/*{icon && <Icon type={icon}/>}*/}
-                {/*<span>{title}</span>*/}
                 <Link to={key}>
-
                     <span>{title}</span>
                 </Link>
             </Menu.Item>
@@ -32,12 +29,10 @@ class CustomMenu extends React.Component {
     }
     render() {
         return (
-
             <Menu
-
                 onClick={this.handleClick}
-                defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub1']}
+                defaultSelectedKeys='/Login/InformationPage'
+                defaultOpenKeys="1"
                 mode="inline"
                 theme="dark"
             >
@@ -50,4 +45,4 @@ class CustomMenu extends React.Component {
         )
     }
 }
-export default CustomMenu
+export default CustomMenu;

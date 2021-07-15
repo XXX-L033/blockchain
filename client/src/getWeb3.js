@@ -36,3 +36,4 @@ const getWeb3 = () =>
   });
 
 export default getWeb3;
+//，web3实例应该使用用户的服务提供商Provider。如果浏览器上安装了metamask插件，那么metamask就会自动创建一个web3实例，实例中就已经包含了用户的Provider。我们可以通过window.web3.currentProvider获取浏览器用户的Provider，然后再设置到应用的web3实例中。

@@ -6,16 +6,11 @@ import {Tooltip, Typography, Button, Form, Layout, Steps, Checkbox, Input} from 
 import {LockOutlined, WalletOutlined, EyeInvisibleOutlined, EyeTwoTone, InfoCircleOutlined} from '@ant-design/icons';
 import getWeb3 from "../../getWeb3";
 import SimpleStorageContract from "../../contracts/LoanContract.json";
-import {Link} from "react-router-dom";
+import {Route} from "react-router-dom";
+import IssuePage from "../BondIssuing/IssuePage";
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
-
-const onFinish = (values) => {
-    //const onFinish = (values) => {
-    console.log('issuer', values);
-    //};
-};
 
 const formItemLayout = {
 
@@ -39,6 +34,25 @@ const buttonLayout = {
         offset: 3,
         span: 18,
     },
+};
+let account = null;
+
+const route = {
+    path: `/BondIssuing/IssuePage`,
+    component: IssuePage,
+}
+
+const onFinish = (values) => {
+    account = values.address;
+    //this.props.history.push({ pathname: "/BondIssuing/IssuePage", accounts:{account}});
+    console.log('issuer', values.address);
+    const jumpForm = document.createElement('form');
+    document.body.appendChild(jumpForm);
+    sessionStorage.setItem('account', account);
+    jumpForm.action = `/BondIssuing/IssuePage`;
+    jumpForm.submit();
+
+    document.body.removeChild(jumpForm);
 };
 
 class IssuerLogin extends React.Component {
@@ -81,8 +95,10 @@ class IssuerLogin extends React.Component {
                         <div className="site-layout-background" style={{padding: '10px'}}>
                             <Title style={{fontWeight: 'bold', fontSize: 40, textAlign: 'center'}}>Issuer Login</Title>
                             <br/>
+                            <Route exact path={route.path} component={route.component}/>
                             <Form
                                 {...formItemLayout}
+                                //form={form}
                                 name="issuerLogin"
                                 initialValues={{
                                     remember: true,
@@ -130,11 +146,9 @@ class IssuerLogin extends React.Component {
 
                                 </Form.Item>
                                 <Form.Item {...buttonLayout}>
-                                    <Link to = {{pathname: '/BondIssuing/IssuePage'}}>
-                                    <Button type="primary" htmlType="submit" className="login-form-button">
+                                    <Button type="primary" htmlType="submit" className="login-form-button" >
                                         Log in
                                     </Button>
-                                    </Link>
                                     <br />
                                     Or <a href="">register now!</a>
                                 </Form.Item>

@@ -7,15 +7,22 @@ import {Tooltip, Typography, Button, Form, Layout, Steps, Checkbox, Input} from 
 import {LockOutlined, WalletOutlined, EyeInvisibleOutlined, EyeTwoTone, InfoCircleOutlined} from '@ant-design/icons';
 import getWeb3 from "../../getWeb3";
 import SimpleStorageContract from "../../contracts/LoanContract.json";
-
+import BondDisplay from "../BondPurchase/BondDisplay";
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
 
+const route = {
+    path:`/BondPurchase/BondDisplay`,
+    component:BondDisplay,
+}
+
 const onFinish = (values) => {
-    console.log('Received values from issuer', values);
-    // const formData = new FormData();
-    // formData.append('address', values.address);
+    console.log('Received values from investor', values);
+    const jumpForm4 = document.createElement('form');
+    document.body.appendChild(jumpForm4);
+    jumpForm4.action = `/BondPurchase/BondDisplay`;
+    jumpForm4.submit();
 };
 
 const formItemLayout = {
@@ -84,6 +91,7 @@ class InvestorLogin extends Component{
                         <div className="site-layout-background" style={{padding: '10px'}}>
                             <Title style={{fontWeight: 'bold', fontSize: 40, textAlign: 'center'}}>Investor Login</Title>
                             <br/>
+                            <Route exact path={route.path} component={route.component}/>
                             <Form
                                 {...formItemLayout}
                                 name="issuerLogin"

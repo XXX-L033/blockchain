@@ -23,7 +23,6 @@ class App extends Component {
                 <BrowserRouter>
                     <Layout style={{ minHeight: '100vh' }}>
                         <Sider
-
                             className="App-customMenu"
                             breakpoint="lg"
                             collapsedWidth="0"

@@ -26,3 +26,28 @@ global.issue = Loadable({
     loader: () => import('./views/BondIssuing/IssuePage'),
     loading: Loading,
 });
+
+global.success = Loadable({
+    loader: () => import('./views/BondIssuing/IssueSuccess'),
+    loading: Loading,
+});
+
+global.check = Loadable({
+    loader: () => import('./views/BondChecking/CheckBond'),
+    loading: Loading,
+});
+
+global.display = Loadable({
+    loader: () => import('./views/BondPurchase/BondDisplay'),
+    loading: Loading,
+});
+
+global.purchase = Loadable({
+    loader: () => import('./views/BondPurchase/PurchasePage'),
+    loading: Loading,
+});
+
+global.transfer = Loadable({
+    loader: () => import('./views/BondPurchase/TransferPage'),
+    loading: Loading,
+});

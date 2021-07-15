@@ -10,13 +10,11 @@ import {
     InfoCircleOutlined,
     IdcardOutlined
 } from '@ant-design/icons';
+import CheckBond from '../BondChecking/CheckBond';
+import {Route} from "react-router-dom";
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
-
-const onFinish = (values) => {
-    console.log('issuer', values);
-};
 
 const formItemLayout = {
 
@@ -42,6 +40,18 @@ const buttonLayout = {
     },
 };
 
+const route = {
+    path: `/BondChecking/CheckBond`,
+    component: CheckBond,
+};
+
+const onFinish = (values) =>{
+    const jumpForm3 = document.createElement('form');
+    document.body.appendChild(jumpForm3);
+    jumpForm3.action = `/BondChecking/CheckBond`;
+    jumpForm3.submit();
+}
+
 class RegulatorLoginLogin extends React.Component {
     render() {
         return (
@@ -50,8 +60,10 @@ class RegulatorLoginLogin extends React.Component {
                     <Header className="site-layout-sub-header-background" style={{padding: 0}}/>
                     <Content>
                         <div className="site-layout-background" style={{padding: '10px'}}>
-                            <Title style={{fontWeight: 'bold', fontSize: 40, textAlign: 'center'}}>Financial Regulator Login</Title>
+                            <Title style={{fontWeight: 'bold', fontSize: 40, textAlign: 'center'}}>Financial Regulator
+                                Login</Title>
                             <br/>
+                            <Route exact path={route.path} component={route.component}/>
                             <Form
                                 {...formItemLayout}
                                 name="regulatorLogin"
@@ -104,7 +116,7 @@ class RegulatorLoginLogin extends React.Component {
                                     <Button type="primary" htmlType="submit" className="login-form-button">
                                         Log in
                                     </Button>
-                                    <br />
+                                    <br/>
                                     Or <a href="">register now!</a>
                                 </Form.Item>
                             </Form>
