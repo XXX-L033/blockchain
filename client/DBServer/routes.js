@@ -19,20 +19,24 @@ app.route('/bond') //path
             "message": "",
             "data": [],
         }
-        console.log("aaa")
         DB.find({})
             .then(result =>{
                 response.header("Access-Control-Allow-Origin", "*")
-                console.log("bbb");
                 console.log(result)
                 response.json(result);
             })
+    });
 
-        // ret.data = datas
-        //
-        // //response.setHeader("Cache-Control", "no-cache")
-        // response.send(ret)
-
+app.route('/bond/:id')
+    .get(async function (request, response) {
+        DB.findById(request.params.id)
+            .then(result =>{
+                response.header("Access-Control-Allow-Origin", "*")
+                response.json(result)
+            })
+            .catch(err =>{
+                response.json(err)
+            })
     });
 
 app.route('/issue')
@@ -62,6 +66,8 @@ app.route('/issue')
             }
         })
     });
+
+
 
 module.exports = app.route;
 

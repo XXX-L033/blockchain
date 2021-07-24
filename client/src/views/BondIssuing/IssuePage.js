@@ -44,13 +44,13 @@ const route = {
     component: IssueSuccess,
 }
 
-const checkOptions = [{label: '1 ETH', value: '1'},
-    {label: '5 ETH', value: '5'},
-    {label: '10 ETH', value: '10'},
-    {label: '20 ETH', value: '20'},
-    {label: '50 ETH', value: '50'},
-    {label: '100 ETH', value: '100'},
-    {label: '200 ETH', value: '200'},
+const checkOptions = [{label: '1 ETH', value: '1 ETH'},
+    {label: '5 ETH', value: '5 ETH'},
+    {label: '10 ETH', value: '10 ETH'},
+    {label: '20 ETH', value: '20 ETH'},
+    {label: '50 ETH', value: '50 ETH'},
+    {label: '100 ETH', value: '100 ETH'},
+    {label: '200 ETH', value: '200 ETH'},
 ];
 
 const dataFormat = 'YYYY/MM/DD';
@@ -126,7 +126,7 @@ class IssuePage extends Component {
                                 name="bondIssue1"
                                 initialValues={{
                                     remember: true,
-                                    ["address"]: acc,
+                                    ["account"]: acc,
                                 }}
                                 onFinish={this.handle.bind(this)}
                                 layout='inline'
@@ -235,7 +235,7 @@ class IssuePage extends Component {
                                                 <Form.Item
                                                     style={{padding: '10px 0px'}}
                                                     label="MetaMask Account"
-                                                    name="address"
+                                                    name="account"
                                                     rules={[
                                                         {
                                                             required: true,

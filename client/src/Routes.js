@@ -22,6 +22,11 @@ global.regulator = Loadable({
     loading: Loading,
 });
 
+global.verifier = Loadable({
+    loader: () => import('./views/Login/VerifierLogin'),
+    loading: Loading,
+});
+
 global.issue = Loadable({
     loader: () => import('./views/BondIssuing/IssuePage'),
     loading: Loading,
@@ -34,6 +39,11 @@ global.success = Loadable({
 
 global.check = Loadable({
     loader: () => import('./views/BondChecking/CheckBond'),
+    loading: Loading,
+});
+
+global.green = Loadable({
+    loader: () => import('./views/BondChecking/GreenFeature'),
     loading: Loading,
 });
 

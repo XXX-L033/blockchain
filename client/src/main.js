@@ -18,5 +18,9 @@ global.menus = [
         title: 'Regulator Login',
         icon: 'IssuesCloseOutlined',
         key: '/Login/RegulatorLogin',
-    },
+    },{
+        title: 'Verifier Login',
+        icon: 'IssuesCloseOutlined',
+        key: '/Login/VerifierLogin',
+    }
 ]
