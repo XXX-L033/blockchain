@@ -20,7 +20,14 @@ const DBModel = new Schema({
     startDate:Date,
     maturityDate:Date,
     faceValue:Array,
-    description:String
+    url:String,
+    description:String,
+    regulator:Boolean,
+    verifier:Boolean,
+    regulatorFeedback:String,
+    verifierFeedback:String,
+    tokenAddress:String,
+    state:Boolean
 });
 
 

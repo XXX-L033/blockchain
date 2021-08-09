@@ -14,6 +14,8 @@ class ContentMain extends React.Component {
                     <Route exact path='/Login/RegulatorLogin' component={global.regulator}/>
                     <Route exact path='/Login/VerifierLogin' component={global.verifier}/>
                     <Route exact path='/BondIssuing/IssuePage' component={global.issue}/>
+                    <Route exact path='/BondIssuing/BondIssue' component={global.issueMid}/>
+                    <Route exact path='/BondIssuing/StateCheck' component={global.state}/>
                     <Route exact path='/BondIssuing/IssueSuccess' component={global.success}/>
                     <Route exact path='/BondChecking/CheckBond' component={global.check}/>
                     <Route exact path='/BondChecking/GreenFeature' component={global.green}/>

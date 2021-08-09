@@ -8,6 +8,7 @@ import getWeb3 from "../../getWeb3";
 import SimpleStorageContract from "../../contracts/LoanContract.json";
 import {Route} from "react-router-dom";
 import IssuePage from "../BondIssuing/IssuePage";
+import BondIssue from "../BondIssuing/BondIssue";
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
@@ -38,8 +39,8 @@ const buttonLayout = {
 let account = null;
 
 const route = {
-    path: `/BondIssuing/IssuePage`,
-    component: IssuePage,
+    path: `/BondIssuing/BondIssue`,
+    component: BondIssue,
 }
 
 const onFinish = (values) => {
@@ -49,7 +50,7 @@ const onFinish = (values) => {
     const jumpForm = document.createElement('form');
     document.body.appendChild(jumpForm);
     sessionStorage.setItem('account', account);
-    jumpForm.action = `/BondIssuing/IssuePage`;
+    jumpForm.action = `/BondIssuing/BondIssue`;
     jumpForm.submit();
 
     document.body.removeChild(jumpForm);

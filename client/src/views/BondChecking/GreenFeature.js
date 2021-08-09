@@ -1,40 +1,50 @@
 import React, {Component} from "react";
 import 'antd/dist/antd.css';
 import '../../index.css';
-import {Layout, Typography, Table, Button, Modal} from "antd";
+import ReactDOM from 'react-dom';
+import {Layout, Typography, Table, Button, Modal, Alert, Input} from "antd";
 import $ from 'jquery'
 import getWeb3 from "../../getWeb3";
 import LoanToken from "../../contracts/LoanToken.json"
 
 const {Header, Content} = Layout;
 const {Title} = Typography;
+const {TextArea} = Input;
+const stateAccount = '0x005F27B38406Ca25d40ac9B950A9E7b2F3c8033f'
+const stateAccount1 = '0x9Bd41Db18ed0Bd1AD0747eA709CE74522F44a4c1'
 
-class GreenFeature extends Component {
+class CheckBond extends Component {
     constructor(props) {
         super(props);
         this.state = {
             tableData: [],
+            web3: null,
             account: null,
             visible: false,
+            textVisible: false,
             BName: null,
             name: null,
             BSymbol: null,
-            description: null
+            type: null,
+            url: null,
+            description: null,
+            regulator: false,
+            verifier: false,
+            tokenId: 0,
+            verifierFeedback: null,
+            state:false
         }
+        this.handleReady = this.handleReady.bind(this)
+        this.childHandle = this.childHandle.bind(this)
     }
+
 
     componentDidMount = async () => {
         this.getData()
-
         try {
             const web3 = await getWeb3()
-
-            //Promise - return network id that connected
-            const networkId = await web3.eth.net.getId();
-            const deployedNetwork = LoanToken.networks[networkId];
-            const token = new web3.eth.Contract(LoanToken.abi, deployedNetwork && deployedNetwork.address)
-            console.log(token)
-            //let num = await token.methods.awardItem().call();
+            this.setState({web3})
+            //await this.instantiateContract()
         } catch (e) {
             alert(
                 `Failed to load web3, accounts, or contract. Check console for details.`,
@@ -43,9 +53,10 @@ class GreenFeature extends Component {
         }
     }
 
+
     getData = () => {
         $.ajax({
-            url: 'http://localhost:8888/bond',
+            url: 'http://localhost:8888/bond/verifier',
             type: 'get',
             dataType: 'json',
             success: res => {
@@ -58,28 +69,118 @@ class GreenFeature extends Component {
         })
     }
 
-    handleOk = () => {
-        this.setState({
-            visible: false
+    handleReady = async (values) => {
+        values.verifier = true;
+        if(values.regulator == true){
+            values.state = true
+        }
+        console.log(values)
+
+        fetch(`http://127.0.0.1:8888/update`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'message=' + JSON.stringify(values),
+        }).then((response) => {
+            return response.json()
+        }).catch(function (error) {
+            console.log(error)
         })
+        this.setState({
+            visible:false,
+        })
+
+        // alert('Click to agree that the bond meets the financial issuance standards, ' +
+        //     'if the financial regulator also agrees to issue, the bond will be issued at the start time')
+
+        //await this.issueBond()
+    };
+
+
+    issueBond = async () => {
+        const {account, regulator, verifier, startDate} = this.state;
+        const contract = require('truffle-contract')
+        const loanToken = contract(LoanToken)
+        loanToken.setProvider(this.state.web3.currentProvider)
+        let loanTokenInstance;
+        console.log("start" + startDate);
+        let date = new Date(startDate);
+        let dateUnix = Math.floor(date.getTime() / 1000);
+
+        loanToken.deployed().then((instance) => {
+            loanTokenInstance = instance
+            //console.log("loan"+loanTokenInstance);
+            this.setState({loan: loanTokenInstance})
+            console.log(instance)
+
+            instance.awardItem(account, dateUnix, {from: account})
+            const id = instance.getItemId().then(function (bn) {
+                instance.transferItem(account, stateAccount, bn.toString(), {from: account});
+                console.log(bn.toString())
+                return bn.toString()
+            });
+        })
+
+        if (regulator == true && verifier == true) {
+
+        }
     };
 
     handleCancel = () => {
         this.setState({
-            visible: false
+            textVisible: true
         })
     };
+
+    inputChange(e) {
+        this.setState({
+            verifierFeedback: e.target.value
+        })
+    }
+
+    childHandle = (values) => {
+        this.setState({
+            textVisible: false,
+            visible: false
+        })
+        values.verifierFeedback = this.state.verifierFeedback
+        console.log(values);
+        fetch(`http://127.0.0.1:8888/update`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'message=' + JSON.stringify(values),
+        }).then((response) => {
+            return response.json()
+        }).catch(function (error) {
+            console.log(error)
+        })
+    }
+
+    childCancel = () => {
+        this.setState({
+            textVisible: false,
+            visible: false,
+        })
+    }
 
     getSpecificBond = (id, obj) => {
         this.setState({
             visible: true,
             BName: obj.BName,
             name: obj.name,
+            type: obj.type,
+            url: obj.url,
             BSymbol: obj.BSymbol,
-            account: obj.account,
+            regulator: obj.regulator,
+            verifier: obj.verifier,
             description: obj.description
         })
-        console.log(obj.BName)
+        console.log(obj)
     }
 
     render() {
@@ -95,11 +196,17 @@ class GreenFeature extends Component {
                 dataIndex: 'name',
                 key: 'name',
             }, {
-                title: 'Description',
-                dataIndex: 'description',
-                key: 'description',
-                sorter: true,
+                title: 'Bond URL',
+                dataIndex: 'url',
+                key: 'url',
+                render: (url) => <a href={"http://"+url}>{url}</a>
             }, {
+                title: 'Interest Rate',
+                dataIndex: 'coupon',
+                key: 'coupon',
+                sorter: (a, b) => a.coupon - b.coupon,
+            }
+            , {
                 title: 'Detail',
                 key: 'detail',
                 render: (record, obj) => {
@@ -109,13 +216,29 @@ class GreenFeature extends Component {
                                 <Button type="primary" onClick={() => {
                                     this.getSpecificBond(record._id, obj)
                                 }}>See Detail</Button>
-                                <Modal title="Bond Detail" visible={this.state.visible} onOk={this.handleOk}
+                                <Modal title="Bond Detail" visible={this.state.visible} okText="Issuable"
+                                       cancelText="Unissuable" onOk={() => {
+                                    this.handleReady(obj)
+                                }}
                                        onCancel={this.handleCancel}>
                                         <p>Bond Name: {this.state.BName}</p>
+                                        <p>Issuer Type: {this.state.type === '1' ? 'Company' : 'Government'}</p>
                                         <p>Issuer Name: {this.state.name}</p>
-                                    <p>Bond Symbol: {this.state.BSymbol}</p>
-                                    <p>Description: {this.state.description}</p>
-                                      </Modal>
+                                        <p>Bond Symbol: {this.state.BSymbol}</p>
+                                        <p>Bond URL:{this.state.url}</p>
+                                        <p>MeatMask Account: {this.state.account}</p>
+                                        <p>Regulator Check State:{this.state.regulator.toString()}</p>
+                                        <p>Verifier Check State:{this.state.verifier.toString()}</p>
+                                        <p>Description: {this.state.description}</p>
+                                </Modal>
+                                <Modal
+                                    title="Feedback Given" visible={this.state.textVisible} onOk={() => {
+                                    this.childHandle(obj)
+                                }}
+                                    onCancel={this.childCancel}>
+                                    <p>Why the bond is unissuable:</p>
+                                    <TextArea type="text" onChange={(e) => this.inputChange(e)} id="feedback" rows={4}/>
+                                </Modal>
                             </span>
                         </div>
                     )
@@ -146,4 +269,4 @@ class GreenFeature extends Component {
     }
 }
 
-export default GreenFeature;
+export default CheckBond;

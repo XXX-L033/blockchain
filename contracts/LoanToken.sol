@@ -22,7 +22,8 @@ contract LoanToken is ERC721 {
 
     constructor() public ERC721("LoanToken", "LTC") {}
 
-    function awardItem(address player) public returns (uint256){
+    function awardItem(address player, uint256 startTime) public returns (uint256){
+        require(block.timestamp > startTime);
         _tokenIds.increment();
 
         newItemId = _tokenIds.current();
@@ -39,32 +40,36 @@ contract LoanToken is ERC721 {
         return 5;
     }
 
+    function checkEnd(uint256 maturityTime) public {
+        require(block.timestamp >= maturityTime);
+    }
 
     function transferItem(address sender, address receiver, uint256 id) public returns (address){
-        transferFrom(sender, receiver, id);
+            //isApprovedForAll(receiver, true);
+            transferFrom(sender, receiver, id);
         return receiver;
     }
 }
 
-contract LoanContract is IERC721Receiver {
-//    LoanToken token;
-//
-//    constructor() public{
-//        LoanToken newToken = new LoanToken();
+//contract LoanContract is IERC721Receiver {
+////    LoanToken token;
+////
+////    constructor() public{
+////        LoanToken newToken = new LoanToken();
+////    }
+//    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
+//        return this.onERC721Received.selector;
 //    }
-    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
-        return this.onERC721Received.selector;
-    }
-
-    function getIssuer() public returns (address){
-        return msg.sender;
-    }
-
-    function createToken(LoanToken token, address sender) public{
-        token.awardItem(sender);
-    }
-
-    function transferToken(LoanToken token, address sender, address receiver, uint256 id) public{
-        token.transferItem(sender, receiver, id);
-    }
-}
+//
+//    function getIssuer() public returns (address){
+//        return msg.sender;
+//    }
+//
+//    function createToken(LoanToken token, address sender) public{
+//        token.awardItem(sender);
+//    }
+//
+//    function transferToken(LoanToken token, address sender, address receiver, uint256 id) public{
+//        token.transferItem(sender, receiver, id);
+//    }
+//}

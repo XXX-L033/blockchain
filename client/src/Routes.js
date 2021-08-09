@@ -26,9 +26,18 @@ global.verifier = Loadable({
     loader: () => import('./views/Login/VerifierLogin'),
     loading: Loading,
 });
+global.issueMid = Loadable({
+    loader: () => import('./views/BondIssuing/BondIssue'),
+    loading: Loading,
+})
 
 global.issue = Loadable({
     loader: () => import('./views/BondIssuing/IssuePage'),
+    loading: Loading,
+});
+
+global.state = Loadable({
+    loader: () => import('./views/BondIssuing/StateCheck'),
     loading: Loading,
 });
 
