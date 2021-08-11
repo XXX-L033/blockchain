@@ -15,11 +15,11 @@ class BondIssue extends Component {
                 <Layout>
                     <Header className="site-layout-sub-header-background" style={{padding: 0}}/>
                     <Tabs defaultActiveKey="state" style={{padding: 10}}>
-                        <TabPane tab="Bond Issue" key="issue" >
-                            <IssuePage/>
-                        </TabPane>
                         <TabPane tab="Check State" key="state">
                             <StateCheck/>
+                        </TabPane>
+                        <TabPane tab="Issue Bond" key="issue" >
+                            <IssuePage/>
                         </TabPane>
                     </Tabs>
                 </Layout>

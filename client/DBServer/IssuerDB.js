@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const app = express();
 
 const db2 = require('./server2');
 
@@ -15,7 +14,12 @@ const IssuerDB = new Schema({
     interestRate:Number,
     tokenId:Number,
     startDate:Date,
-    maturityDate:Date
+    maturityDate:Date,
+    transfer:Boolean,
+    type:String,
+    name:String,
+    url:String,
+    finish:Boolean,
 });
 
 module.exports = mongoose.model('buyer',IssuerDB)

@@ -6,7 +6,7 @@ import {
     Typography,
     Button,
     Layout,
-    Table, Modal
+    Table, Modal, Col, Row
 } from 'antd';
 import getWeb3 from "../../getWeb3";
 import $ from "jquery";
@@ -15,6 +15,7 @@ import LoanToken from "../../contracts/LoanToken.json";
 const {Content} = Layout;
 const {Title} = Typography;
 const acc = sessionStorage.getItem('account');
+const instance = sessionStorage.getItem('instance');
 
 class StateCheck extends Component {
     constructor(props) {
@@ -33,6 +34,7 @@ class StateCheck extends Component {
             state: false,
             textVisible: false,
             loan: null,
+            instance:null
         }
         this.childHandle = this.childHandle.bind(this)
     }
@@ -52,7 +54,7 @@ class StateCheck extends Component {
             this.setState({
                 web3: web3,
                 loan: loanInstance,
-                account:accounts
+                account: accounts
             })
         } catch (e) {
             alert(
@@ -114,49 +116,93 @@ class StateCheck extends Component {
         })
     }
 
+    returnETH = async (obj) => {
+        const {web3, loan} = this.state;
+        let maturityDate = new Date(obj.maturityDate);
+        let maturityUnix = Math.floor(maturityDate.getTime() / 1000);
+        let maturity = await loan.methods.checkEnd(maturityUnix).call();
+
+        //check whether end of period
+        //if (maturity == true) {
+        let faceValue = obj.faceValue;
+        let coupon = obj.interestRate;
+        let toPay = faceValue * (1 + 0.01 * coupon) * 1000000000000000000;
+        web3.eth.sendTransaction({from: obj.account, to: obj.investor, value: toPay})
+
+        //} else {
+        //   alert("The bond has not yet matured")
+        // }
+    }
+
     issue = async (obj) => {
         const {web3, loan, account} = this.state;
         let investor = obj.investor
         const contract = require('truffle-contract')
         const loanToken = contract(LoanToken)
-        let loanTokenInstance;
         loanToken.setProvider(web3.currentProvider)
         let date = new Date(obj.startDate);
         let dateUnix = Math.floor(date.getTime() / 1000);
 
-        if(obj.account === account.toString()){
+        if (obj.account === account.toString()) {
             loanToken.deployed().then(async (instance) => {
-                loanTokenInstance = instance
                 //contract address
-                console.log(instance.address)
                 obj.tokenAddress = instance.address
-
+                //create token
                 instance.awardItem(acc, dateUnix, {from: acc})
-
+                const loanContractInstance = instance
                 let id = await loan.methods.getItemId().call();
-                obj.tokenId = id;
-                obj.state = true;
-                instance.transferItem(acc, investor, id, {from: acc});
-                console.log(id)
-            })
+                console.log(instance);
+                if (id != 0) {
+                    obj.tokenId = id;
 
+                    obj.state = true;
+                    let abi = {};
+                    abi.o = instance.abi;
+                    instance.abi = JSON.stringify(abi)
+                    //let test = {data:instance};
 
-            fetch(`http://localhost:3001/update`, {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: 'message=' + JSON.stringify(obj),
-            }).then((response) => {
-                return response.json()
-            }).catch(function (error) {
-                console.log(error)
+                    let cache = [];
+                    let str = JSON.stringify(instance, function(key, value) {
+                        if (typeof value === 'object' && value !== null) {
+                            if (cache.indexOf(value) !== -1) {
+                                // 移除
+                                return;
+                            }
+                            // 收集所有的值
+                            cache.push(value);
+                        }else if(typeof value === 'function'){
+                            return value.toString()
+                        }
+                        return value;
+                    });
+                    console.log(str)
+                    cache = null;
+
+                    instance.transferItem(acc, investor, id, {from: acc});
+                    //sessionStorage.setItem(obj.tokenAddress,instance)
+                    sessionStorage.setItem(obj.tokenAddress, str);
+
+                    fetch(`http://localhost:3001/update`, {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'message=' + JSON.stringify(obj),
+                    }).then((response) => {
+                        console.log(obj)
+                        return response.json()
+                    }).catch(function (error) {
+                        console.log(error)
+                    })
+                    this.setState({
+                        visible: false,
+                        instance:loanContractInstance
+                    })
+
+                }
             })
-            this.setState({
-                visible: false,
-            })
-        }else{
+        } else {
             alert("MetaMask Accounts does not match")
         }
     }
@@ -230,6 +276,9 @@ class StateCheck extends Component {
                     return (
                         <div>
                             <span>
+                                <Row>
+                                    <Col span={10}>
+                                        {/*注意：obj.state*/}
                                 <Button type="primary" disabled={obj.state} onClick={() => {
                                     this.getSpecificBond(record._id, obj)
                                 }}>Issue</Button>
@@ -241,6 +290,14 @@ class StateCheck extends Component {
                                      <p>Bond Loan will be given to : <b>{obj.investor}</b> on <b>{obj.startDate}</b> </p>
 
                                 </Modal>
+
+                                 </Col>
+                            <Col span={3}>
+                                <Button type="primary" disabled={!obj.state} onClick={() => {
+                                    this.returnETH(obj)
+                                }}>Return</Button>
+                            </Col>
+                        </Row>
                             </span>
                         </div>
                     )

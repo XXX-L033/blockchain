@@ -1,12 +1,18 @@
 const express = require('express');
 const app = express();
 
+
 const DB2 = require('./IssuerDB');
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
 app.listen(3001,() =>{
     console.log("server is running on port 3001")
+})
+
+app.all('*', function (req,res,next){
+    res.header("Access-Control-Allow-Methods", 'PUT, GET, POST, DELETE, OPTIONS')
+    next()
 })
 
 app.route('/request')
@@ -36,8 +42,23 @@ app.route('/request')
 //bond state - for same issuer
 app.route('/bond/:account')
     .get(async function (request, response) {
+        //later add finish:false
         DB2.find({account:request.params.account})
             .then(result => {
+                response.header("Access-Control-Allow-Origin", "*")
+                response.json(result)
+            })
+            .catch(err => {
+                response.json(err)
+            })
+    });
+
+//bond state - for same investor
+app.route('/state/:investor')
+    .get(async function (request, response) {
+        DB2.find({investor:request.params.investor})
+            .then(result => {
+                console.log(request.params.investor)
                 response.header("Access-Control-Allow-Origin", "*")
                 response.json(result)
             })
@@ -56,6 +77,8 @@ app.route('/update/')
                     tokenId: request.tokenId,
                     state:request.state,
                     tokenAddress:request.tokenAddress,
+                    finish:request.finish,
+                    instance:request.instance
                 }
             },
             {
@@ -63,6 +86,7 @@ app.route('/update/')
             }
         )
             .then(result => {
+                console.log(request)
                 response.header("Access-Control-Allow-Origin", "*")
                 response.json(result)
             })

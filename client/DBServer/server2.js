@@ -1,10 +1,10 @@
 const mongoose = require('mongoose'),
     DB_URL = 'mongodb://localhost/test';
-//autoIncrement = require('mongoose-auto-increment');
 
 //syncorized
 mongoose.Promise = global.Promise;
 mongoose.connect(DB_URL);
+mongoose.set('useFindAndModify', false)
 
 
 const db2 = mongoose.connection;

@@ -21,6 +21,7 @@ const onFinish = (values) => {
     console.log('Received values from investor', values);
     const jumpForm4 = document.createElement('form');
     document.body.appendChild(jumpForm4);
+    sessionStorage.setItem('investor', values.address);
     jumpForm4.action = `/BondPurchase/BondDisplay`;
     jumpForm4.submit();
 };

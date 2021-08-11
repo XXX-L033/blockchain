@@ -40,14 +40,22 @@ contract LoanToken is ERC721 {
         return 5;
     }
 
-    function checkEnd(uint256 maturityTime) public {
-        require(block.timestamp >= maturityTime);
+    function checkEnd(uint256 maturityTime) public returns(bool){
+        if(block.timestamp >= maturityTime){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     function transferItem(address sender, address receiver, uint256 id) public returns (address){
             //isApprovedForAll(receiver, true);
             transferFrom(sender, receiver, id);
         return receiver;
+    }
+
+    function setApprove(address owner, address operator, bool approved) public{
+            ApprovalForAll(owner, operator, approved);
     }
 }
 

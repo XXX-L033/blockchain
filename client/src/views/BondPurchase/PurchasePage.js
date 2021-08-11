@@ -1,8 +1,7 @@
 import React, {Component} from "react";
 import 'antd/dist/antd.css';
 import '../../index.css';
-import {Layout, Typography, Table, Button, Modal, Radio, Alert, message, Input, Select} from "antd";
-import {SearchOutlined} from '@ant-design/icons';
+import {Layout, Typography, Table, Button, Modal, Select} from "antd";
 import $ from 'jquery'
 import getWeb3 from "../../getWeb3";
 import LoanToken from "../../contracts/LoanToken.json"
@@ -10,8 +9,6 @@ import LoanToken from "../../contracts/LoanToken.json"
 const {Content} = Layout;
 const {Option} = Select;
 const {Title} = Typography;
-const stateAccount = '0x005F27B38406Ca25d40ac9B950A9E7b2F3c8033f'
-const stateAccount1 = '0x9Bd41Db18ed0Bd1AD0747eA709CE74522F44a4c1'
 
 class PurchasePage extends Component {
 
@@ -40,6 +37,7 @@ class PurchasePage extends Component {
             purchaseValue: 0,
             balanceValue: 0,
             state: false,
+            loan:null
         }
         this.handleOk = this.handleOk.bind(this)
         this.childHandle = this.childHandle.bind(this)
@@ -50,14 +48,22 @@ class PurchasePage extends Component {
         this.getData()
         try {
             const web3 = await getWeb3()
+            //console.log(web3)
             const accounts = await web3.eth.getAccounts();
+            const networkId = await web3.eth.net.getId();
+            const deployedNetwork = LoanToken.networks[networkId];
+            const loanInstance = new web3.eth.Contract(
+                LoanToken.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
             this.setState({
                 web3: web3,
-                investor: accounts.toString()
+                investor: accounts.toString(),
+                loan:loanInstance
             })
         } catch (e) {
             alert(
-                `Failed to load web3, accounts, or contract. Check console for details.`,
+                `woshishabi`,
             );
             console.error(e);
         }
@@ -87,33 +93,32 @@ class PurchasePage extends Component {
 
 
     issueBond = async (values) => {
-        const {web3, account, investor, startDate, purchaseValue, maturityDate} = this.state;
-        // const contract = require('truffle-contract')
-        // const loanToken = contract(LoanToken)
-        // loanToken.setProvider(this.state.web3.currentProvider)
-        // let loanTokenInstance;
-        console.log(web3)
+        const {web3, account, investor, startDate, purchaseValue, maturityDate, loan} = this.state;
+        //console.log(web3)
         let date = new Date(startDate);
-        let dateUnix = Math.floor(date.getTime() / 1000);
         let date2 = new Date(maturityDate);
-        let maturityUnix = Math.floor(date2.getTime() / 1000);
 
-        //let acount = web3.toWei(1,'ether');
         let b = web3.eth.getBalance(investor.toString()).then(function (bn) {
             let balance = bn.toString()
             let paid = purchaseValue * 1000000000000000000;
             if (paid <= balance) {
                 console.log("y")
                 web3.eth.sendTransaction({from: investor, to: account, value: paid})
+                loan.methods.setApprove(account, investor, true);
                 let data = {
                     account: account,
+                    name:values.name,
                     BName: values.BName,
                     investor: investor,
                     faceValue: purchaseValue,
                     startDate: date,
                     maturityDate: date2,
                     interestRate: values.coupon,
+                    type:values.type,
                     state: false,
+                    transfer:false,
+                    finish:false,
+                    url:values.url,
                 }
                 fetch('http://localhost:3001/request', {
                     method: 'post',
@@ -135,25 +140,6 @@ class PurchasePage extends Component {
             }
             return bn.toString()
         });
-
-
-        //console.log(Number(web3.eth.getBalance(investor.toString())))
-        //web3.eth.sendTransaction({from: investor.toString(), to:account, value:10000000000000000})
-
-        // loanToken.deployed().then((instance) => {
-        //     loanTokenInstance = instance
-        //     //console.log("loan"+loanTokenInstance);
-        //     //this.setState({loan: loanTokenInstance})
-        //     console.log(instance)
-        //
-        //
-        //     instance.awardItem(account, dateUnix, {from: account})
-        //     // const id = instance.getItemId().then(function (bn) {
-        //     //     instance.transferItem(account, stateAccount, bn.toString(), {from: account});
-        //     //     console.log(bn.toString())
-        //     //     return bn.toString()
-        //     // });
-        // })
     };
 
     handleCancel = () => {
@@ -225,7 +211,6 @@ class PurchasePage extends Component {
                 ],
                 onFilter: (value, record) => record.type === value,
                 render: type => (type === '1' ? 'Company' : 'Government'),
-                width: '15%',
             }, {
                 title: 'Issuer Name',
                 dataIndex: 'name',
@@ -234,13 +219,14 @@ class PurchasePage extends Component {
                 title: 'Start Date',
                 dataIndex: 'startDate',
                 key: 'startDate',
-                //render:startDate=>(new Date(startDate)),
+                render:startDate=>(startDate.toString().substr(0,10)),
                 //sorter: (a, b) => a.startDate - b.startDate,
             }, {
                 title: 'Interest Rate',
                 dataIndex: 'coupon',
                 key: 'coupon',
                 sorter: (a, b) => a.coupon - b.coupon,
+                render: coupon => (coupon+" %")
             }
             , {
                 title: 'Detail',
