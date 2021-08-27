@@ -99,35 +99,6 @@ class CheckBond extends Component {
     };
 
 
-    issueBond = async () => {
-        const {account, regulator, verifier, startDate} = this.state;
-        const contract = require('truffle-contract')
-        const loanToken = contract(LoanToken)
-        loanToken.setProvider(this.state.web3.currentProvider)
-        let loanTokenInstance;
-        console.log("start" + startDate);
-        let date = new Date(startDate);
-        let dateUnix = Math.floor(date.getTime() / 1000);
-
-        loanToken.deployed().then((instance) => {
-            loanTokenInstance = instance
-            //console.log("loan"+loanTokenInstance);
-            this.setState({loan: loanTokenInstance})
-            console.log(instance)
-
-            instance.awardItem(account, dateUnix, {from: account})
-            const id = instance.getItemId().then(function (bn) {
-                instance.transferItem(account, stateAccount, bn.toString(), {from: account});
-                console.log(bn.toString())
-                return bn.toString()
-            });
-        })
-
-        if (regulator == true && verifier == true) {
-
-        }
-    };
-
     handleCancel = () => {
         this.setState({
             textVisible: true

@@ -96,48 +96,6 @@ class CheckBond extends Component {
     };
 
 
-    issueBond = async () => {
-        const {account, startDate} = this.state;
-        const contract = require('truffle-contract')
-        const loanToken = contract(LoanToken)
-        loanToken.setProvider(this.state.web3.currentProvider)
-        let loanTokenInstance;
-        console.log("start" + startDate);
-        let date = new Date(startDate);
-        let dateUnix = Math.floor(date.getTime() / 1000);
-
-        loanToken.deployed().then((instance) => {
-            loanTokenInstance = instance
-            //console.log("loan"+loanTokenInstance);
-            this.setState({loan: loanTokenInstance})
-            console.log(instance)
-
-            instance.awardItem(account, dateUnix, {from: account})
-            const id = instance.getItemId().then(function (bn) {
-                instance.transferItem(account, stateAccount, bn.toString(), {from: account});
-                console.log(bn.toString())
-                return bn.toString()
-            });
-        })
-
-       //if (regulator == true && verifier == true) {
-            // console.log(regulator)
-            //console.log("loan"+loan.address);
-            // const networkId = await web3.eth.net.getId();
-            // const deployedNetwork = LoanToken.networks[networkId];
-            // const token = new web3.eth.Contract(LoanToken.abi, deployedNetwork && deployedNetwork.address)
-            // // console.log(token)
-            // const token1 = await token.deployed()
-            // const num = await token.returnNum().call();
-            // // const newToken = await token.methods.awardItem('0x51d0Ae990fa1aef157D0dAD66409445928d3404B').call()
-            // // //console.log(contract.methods.ownerOf(1).call());
-            // console.log(num)
-            //await this.instantiateContract()
-       // }
-        // const num = await contract.methods.returnNum().call();
-        // console.log(num);
-    };
-
     handleCancel = () => {
         this.setState({
             textVisible: true
@@ -151,10 +109,25 @@ class CheckBond extends Component {
         //console.log(e.target.value)
     }
 
-    childHandle = () => {
+    childHandle = (values) => {
         this.setState({
-            textVisible:false,
-            visible:false
+            textVisible: false,
+            visible: false
+        })
+
+        values.regulatorFeedback = this.state.regulatorFeedback
+        console.log(values);
+        fetch(`http://127.0.0.1:8888/update`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'message=' + JSON.stringify(values),
+        }).then((response) => {
+            return response.json()
+        }).catch(function (error) {
+            console.log(error)
         })
     }
 
@@ -202,6 +175,7 @@ class CheckBond extends Component {
                 title: 'Start Date',
                 dataIndex: 'startDate',
                 key: 'startDate',
+                render: startDate => (startDate.toString().substr(0, 10)),
             }, {
                 title: 'Interest Rate',
                 dataIndex: 'coupon',
@@ -228,8 +202,8 @@ class CheckBond extends Component {
                                     <p>Company Net Income: {this.state.income}</p>
                                     <p>MeatMask Account: {this.state.account}</p>
                                     <p>Bond Interest Rate: {this.state.coupon} %</p>
-                                    <p>Bond Start Date: {this.state.startDate}</p>
-                                    <p>Bond Maturity Date: {this.state.maturityDate}</p>
+                                    <p>Bond Start Date: {new Date(this.state.startDate).toString().substr(0, 10)}</p>
+                                    <p>Bond Maturity Date: {new Date(this.state.maturityDate).toString().substr(0, 10)}</p>
                                     <p>Face Value: </p>
                                     {(this.state.faceValue || []).map((item, index) => {
                                         return <p key={index+item}>{item === '1'?'1 ETH ':item ==='10'?'10 ETH ':

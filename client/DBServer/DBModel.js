@@ -27,11 +27,9 @@ const DBModel = new Schema({
     regulatorFeedback:String,
     verifierFeedback:String,
     tokenAddress:String,
-    state:Boolean
+    state:Boolean,
+    totalGet:Number,
+    totalPerson:Number,
 });
 
-
-
-//id-incresement
-//DBModel.plugin(db.autoIncrement.plugin, {model:})
-module.exports = mongoose.model('database',DBModel)
+module.exports = mongoose.model('bond',DBModel)

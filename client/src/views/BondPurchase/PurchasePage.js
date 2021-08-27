@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import 'antd/dist/antd.css';
 import '../../index.css';
-import {Layout, Typography, Table, Button, Modal, Select} from "antd";
+import {Layout, Typography, Table, Button, Modal, Select, Col} from "antd";
 import $ from 'jquery'
 import getWeb3 from "../../getWeb3";
 import LoanToken from "../../contracts/LoanToken.json"
@@ -37,7 +37,7 @@ class PurchasePage extends Component {
             purchaseValue: 0,
             balanceValue: 0,
             state: false,
-            loan:null
+            loan: null
         }
         this.handleOk = this.handleOk.bind(this)
         this.childHandle = this.childHandle.bind(this)
@@ -59,12 +59,10 @@ class PurchasePage extends Component {
             this.setState({
                 web3: web3,
                 investor: accounts.toString(),
-                loan:loanInstance
+                loan: loanInstance
             })
         } catch (e) {
-            alert(
-                `woshishabi`,
-            );
+            alert();
             console.error(e);
         }
     }
@@ -100,26 +98,46 @@ class PurchasePage extends Component {
 
         let b = web3.eth.getBalance(investor.toString()).then(function (bn) {
             let balance = bn.toString()
-            let paid = purchaseValue * 1000000000000000000;
+            let paid = purchaseValue / (1 + values.coupon * 0.01) * 1000000000000000000;
+
+            //check balance > need to pay, update 2 databases
             if (paid <= balance) {
                 console.log("y")
                 web3.eth.sendTransaction({from: investor, to: account, value: paid})
-                loan.methods.setApprove(account, investor, true);
+
+                values.totalGet =+ purchaseValue;
+                values.totalPerson =+ 1;
+
+                //update bond database - money get, total person
+                fetch(`http://127.0.0.1:8888/update`,{
+                    method:'post',
+                    headers: {
+                        'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'message='+JSON.stringify(values),
+                }).then((response) =>{
+                    return response.json()
+                }).catch(function (error) {
+                    console.log(error)
+                })
                 let data = {
                     account: account,
-                    name:values.name,
+                    name: values.name,
                     BName: values.BName,
                     investor: investor,
                     faceValue: purchaseValue,
                     startDate: date,
                     maturityDate: date2,
                     interestRate: values.coupon,
-                    type:values.type,
+                    type: values.type,
                     state: false,
-                    transfer:false,
-                    finish:false,
-                    url:values.url,
+                    transfer: false,
+                    finish: false,
+                    url: values.url,
                 }
+
+                //add investor database, add new purchase
                 fetch('http://localhost:3001/request', {
                     method: 'post',
                     headers: {
@@ -219,14 +237,14 @@ class PurchasePage extends Component {
                 title: 'Start Date',
                 dataIndex: 'startDate',
                 key: 'startDate',
-                render:startDate=>(startDate.toString().substr(0,10)),
+                render: startDate => (startDate.toString().substr(0, 10)),
                 //sorter: (a, b) => a.startDate - b.startDate,
             }, {
                 title: 'Interest Rate',
                 dataIndex: 'coupon',
                 key: 'coupon',
                 sorter: (a, b) => a.coupon - b.coupon,
-                render: coupon => (coupon+" %")
+                render: coupon => (coupon + " %")
             }
             , {
                 title: 'Detail',
@@ -247,11 +265,10 @@ class PurchasePage extends Component {
                                         <p>Issuer Name: {this.state.name}</p>
                                     <p>Issuer Type: {this.state.type === '1' ? 'Company' : 'Government'}</p>
                                     <p>Bond Symbol: {this.state.BSymbol}</p>
-                                    <p>Company Net Income: {this.state.income}</p>
                                     <p>Bond Interest Rate: {this.state.coupon} %</p>
                                     <p>Bond URL: <a href={"http://" + this.state.url}>{this.state.url}</a></p>
-                                    <p>Bond Start Date: {this.state.startDate}</p>
-                                    <p>Bond Maturity Date: {this.state.maturityDate}</p>
+                                    <p>Bond Start Date: {new Date(this.state.startDate).toString().substr(0, 10)}</p>
+                                    <p>Bond Maturity Date: {new Date(this.state.maturityDate).toString().substr(0, 10)}</p>
                                     <p>Face Value: </p>
                                     <Select style={{width: 120}} defaultValue="Select ETH" onChange={this.handleChange}>
                                     {(this.state.faceValue || []).map((item, index) => {
@@ -271,6 +288,14 @@ class PurchasePage extends Component {
                                      <p>Are you sure you want to purchase Bond: <b>{this.state.BName}</b> with <b>{this.state.purchaseValue}ETH</b> ?</p>
 
                                 </Modal>
+                                {/*<Modal*/}
+                                {/*    title="Ensure" visible={this.state.transferVisible} onOk={() => {*/}
+                                {/*    this.childTransfer(obj)*/}
+                                {/*}}*/}
+                                {/*    onCancel={this.childCancel}>*/}
+                                {/*     <p>Are you sure you want to sell Bond: <b>{this.state.BName}</b> with <b>{this.state.purchaseValue}ETH</b> ?</p>*/}
+
+                                {/*</Modal>*/}
                             </span>
                         </div>
                     )

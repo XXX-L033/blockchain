@@ -39,6 +39,7 @@ class BondState extends Component {
             state: false,
             loan:null,
         }
+        this.transferToken = this.transferToken.bind(this)
     }
 
     componentDidMount = async () => {
@@ -55,6 +56,7 @@ class BondState extends Component {
             );
             console.log(loanInstance)
             this.setState({
+                web3:web3,
                 loan:loanInstance
             })
         } catch (e) {
@@ -88,23 +90,17 @@ class BondState extends Component {
     };
 
     returnToken = async (obj) =>{
-        const {loan} = this.state
+        const {loan,web3} = this.state
         let maturityDate = new Date(obj.maturityDate);
         let maturityUnix = Math.floor(maturityDate.getTime() / 1000);
+
+        let instance = new web3.eth.Contract(LoanToken.abi,obj.tokenAddress);
+        console.log(instance)
         let maturity = await loan.methods.checkEnd(maturityUnix).call();
         if(maturity == true){
-        //let instance = JSON.parse(sessionStorage.getItem(obj.tokenAddress))
-        //console.log(instance)
 
-        // let json = JSON.parse(sessionStorage.getItem(obj.tokenAddress),function(k,v){
-        //     if(v.indexOf && v.indexOf('function') > -1){
-        //         return eval("(function(){return "+v+" })()")
-        //     }
-        //     return v;
-        // });
-        // console.log(json)
-        loan.transferItem(obj.investor, obj.account, obj.tokenId);
-        console.log(loan)
+        instance.methods.transferItem(obj.investor, obj.account, obj.tokenId).send({from:obj.investor})
+        console.log(instance)
         }else{
             this.setState({
                 textVisible:true,
@@ -113,16 +109,31 @@ class BondState extends Component {
     }
 
     transferToken = async (obj) =>{
+        obj.transfer = true;
 
+        fetch(`http://127.0.0.1:3001/update`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'message=' + JSON.stringify(obj),
+        }).then((response) => {
+            return response.json()
+        }).catch(function (error) {
+            console.log(error)
+        })
     }
 
     getSpecificBond = async (id, obj) => {
-        const {loan} = this.state
+        const {web3, loan} = this.state
         this.setState({
             visible: true,
             _id: id,
             state:obj.state
         })
+        console.log(id)
+        console.log(obj.tokenId)
         let maturityDate = new Date(obj.maturityDate);
         let maturityUnix = Math.floor(maturityDate.getTime() / 1000);
         let maturity = await loan.methods.checkEnd(maturityUnix).call();
@@ -131,7 +142,8 @@ class BondState extends Component {
             this.setState({
                 state:true
             })
-            loan.methods.transferItem(obj.investor, obj.account, obj.tokenId);
+            let instance = new web3.eth.Contract(LoanToken.abi,obj.tokenAddress);
+            instance.methods.transferItem(obj.investor, obj.account, obj.tokenId).send({from:obj.investor})
         }
 
     }
@@ -159,14 +171,20 @@ class BondState extends Component {
                 sorter: (a, b) => a.interestRate - b.interestRate,
                 render:rate =>(rate+" %")
             }, {
-                title: 'Loan ID',
-                dataIndex: 'tokenId',
-                key: 'tokenId'
-            }, {
                 title:'Purchase State',
                 dataIndex:'state',
                 key:'state',
                 render:state => (state.toString() === 'true'? "Success": "Unhandled")
+            },{
+                title:'Transfer State',
+                dataIndex:'transfer',
+                key:'transfer',
+                render:transfer => (transfer.toString() === 'true'? "Transferring": "No")
+            },{
+                title:'Repaid State',
+                dataIndex:'finish',
+                key:'finish',
+                render:finish => (finish.toString() === 'true'? "Success": "Unhandled")
             },{
                 title: 'Operate',
                 key: 'operate',
@@ -196,7 +214,7 @@ class BondState extends Component {
                                         </Col>
                                     <Col span={3}>
                                 <Button type="primary" disabled={obj.finish} onClick={()=>{this.returnToken(obj)}}>Transfer</Button>
-                                        <Modal title="Alert" visible={this.state.textVisible} okText="Transfer" onOk={this.transferToken(obj)}
+                                        <Modal title="Alert" visible={this.state.textVisible} okText="Transfer" onOk={()=>this.transferToken(obj)}
                                         onCancel={this.handleCancel}>
                                             <p>This bond is not yet due, you can choose to hold it or transfer</p>
                                         </Modal>

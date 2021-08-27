@@ -54,7 +54,7 @@ class BondDisplay extends Component {
                         <TabPane tab="Bond State" key="state" forceRender={true}>
                             <BondState/>
                         </TabPane>
-                        <TabPane tab="Bond Transfer" key="transfer" forceRender={true}>
+                        <TabPane tab="Secondary Market" key="transfer" forceRender={true}>
                             <TransferPage/>
                         </TabPane>
                     </Tabs>

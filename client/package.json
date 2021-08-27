@@ -18,15 +18,15 @@
     "react-responsive": "^8.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^1.1.5",
+    "react-scripts": "^4.0.3",
     "truffle-contract": "^4.0.31",
-    "web3": "1.2.2",
-    "webpack": "^5.38.1"
+    "web3": "^1.2.1",
+    "webpack": "^4.44.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "mocha --exit",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -43,5 +43,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0"
   }
 }

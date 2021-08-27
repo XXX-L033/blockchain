@@ -18,7 +18,7 @@ class IssueSuccess extends Component {
                     <Content>
                         <div className="site-layout-background" style={{padding: '10px'}}>
                             <Title style={{fontSize: 30, textAlign: 'left'}}>Success !</Title>
-                            <Title style={{fontSize: 17, textAlign: 'left'}}>Your application has been submitted to Financial Regulator, bond will be issued if they meet the requirement.</Title>
+                            <Title style={{fontSize: 17, textAlign: 'left'}}>Your application has been submitted to <b>Financial Regulator</b> and <b>Green Feature Verifier</b>, bond will be issued if they meet the requirement.</Title>
                         </div>
                     </Content>
                 </Layout>

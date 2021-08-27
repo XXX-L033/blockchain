@@ -23,10 +23,10 @@ class InformationPage extends Component {
                             <Title style={{fontWeight: 'bold', fontSize: 25, textAlign: 'left'}}> What you can do
                                 here:</Title>
                             <Steps direction="vertical" current={3}>
-                                <Step title="Issue" description="Issuer fill the green bond form"/>
+                                <Step title="Issue" description="Issuer fills the green bond form"/>
                                 <Step title="Check" description="
-                                    Financial regulator check the bond"/>
-                                <Step title="Purchase" description="Investor purchase the bond"/>
+                                    Financial regulator/Green feature verifier check the bond"/>
+                                <Step title="Purchase" description="Investor purchases the bond"/>
                                 <Step title="Mature" description="Investor gets money at maturity date"/>
                             </Steps>
                         </div>

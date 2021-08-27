@@ -7,13 +7,6 @@ import "openzeppelin-solidity/contracts/utils/Counters.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract LoanToken is ERC721 {
-    //    constructor () ERC721Token (" LoanToken "," LTC ") public {
-    //    }
-    //
-    //    function mint ( address _company , uint256 _tokenId )
-    //    public {
-    //        super . _mint ( _company , _tokenId );
-    //    }
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     string BName;
@@ -23,12 +16,11 @@ contract LoanToken is ERC721 {
     constructor() public ERC721("LoanToken", "LTC") {}
 
     function awardItem(address player, uint256 startTime) public returns (uint256){
-        require(block.timestamp > startTime);
+        //require(block.timestamp > startTime);
         _tokenIds.increment();
 
         newItemId = _tokenIds.current();
         _mint(player, newItemId);
-        //_setTokenURI(newItemId, tokenURI);
         return newItemId;
     }
 
@@ -36,9 +28,6 @@ contract LoanToken is ERC721 {
         return newItemId;
     }
 
-    function returnNum() public view returns(uint256){
-        return 5;
-    }
 
     function checkEnd(uint256 maturityTime) public returns(bool){
         if(block.timestamp >= maturityTime){
