@@ -21,7 +21,6 @@
     "react-scripts": "^4.0.3",
     "truffle-contract": "^4.0.31",
     "web3": "^1.2.1",
-    "webpack": "^4.44.2"
   },
   "scripts": {
     "start": "react-scripts start",
