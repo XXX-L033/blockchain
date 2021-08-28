@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "node client/DBServer/server.js",
-    "heroku-postbuild": "cd client/ && npm install && npm run build",
+    "heroku-postbuild": "cd client/ && npm cache clean --force && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
