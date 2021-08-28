@@ -22,6 +22,9 @@
     "truffle-contract": "^4.0.31",
     "web3": "^1.2.1",
   },
+  "engine":{
+    "npm": "7.19.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
