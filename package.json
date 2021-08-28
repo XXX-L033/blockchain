@@ -1,34 +1,51 @@
 {
-  "name": "myproject",
-  "version": "1.0.0",
-  "engines": {
-    "node": "14.x",
-    "npm": "7.x"
-  },
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@drizzle/store": "^1.5.3",
-    "@openzeppelin/contracts": "^4.0.0",
-    "ethereumjs-wallet": "^1.0.1",
-    "npm": "^5.7.0",
-    "openzeppelin-solidity": "^4.2.0",
-    "react-native-sqlite-storage": "^5.0.0",
-    "truffle-hdwallet-provider": "^1.0.17",
-    "truffle-wallet-provider": "0.0.5",
-    "web3": "^1.3.5",
-    "zeppelin-solidity": "^1.12.0"
-  },
-  "devDependencies": {
-    "dotenv": "^8.2.0"
-  },
-  "main": "truffle-config.js",
-  "directories": {
-    "test": "test"
+    "antd": "^4.16.2",
+    "body-parser": "^1.19.0",
+    "bootstrap": "^5.0.2",
+    "ethers": "^4.0.0-beta.3",
+    "express": "^4.17.1",
+    "jquery": "^3.6.0",
+    "mobx-react": "^7.2.0",
+    "mongoose": "^5.13.2",
+    "react": "16.11.0",
+    "react-bootstrap": "^1.6.1",
+    "react-dom": "16.11.0",
+    "react-loadable": "^5.5.0",
+    "react-responsive": "^8.2.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^4.0.3",
+    "truffle-contract": "^4.0.31",
+    "web3": "^1.2.1",
+    "webpack": "^4.44.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./client/DBServer/server.js"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "mocha --exit",
+    "eject": "react-scripts eject"
   },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0"
+  }
 }
