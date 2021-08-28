@@ -22,7 +22,8 @@
     "truffle-contract": "^4.0.31",
     "web3": "^1.2.1",
   },
-  "engine":{
+  "engines":{
+    "node":"14.15.1",
     "npm": "7.19.1"
   },
   "scripts": {
