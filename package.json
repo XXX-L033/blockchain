@@ -1,6 +1,9 @@
 {
   "name": "myproject",
   "version": "1.0.0",
+  "engines": {
+    "node": "14.x"
+  }
   "dependencies": {
     "@drizzle/store": "^1.5.3",
     "@openzeppelin/contracts": "^4.0.0",
