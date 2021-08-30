@@ -15,6 +15,7 @@ contract LoanToken is ERC721 {
 
     constructor() public ERC721("LoanToken", "LTC") {}
 
+    //generate new token
     function awardItem(address player, uint256 startTime) public returns (uint256){
         //require(block.timestamp > startTime);
         _tokenIds.increment();
@@ -24,11 +25,12 @@ contract LoanToken is ERC721 {
         return newItemId;
     }
 
+    //get tokenId
     function getItemId() public view returns(uint256){
         return newItemId;
     }
 
-
+    //check whether date > maturity date
     function checkEnd(uint256 maturityTime) public returns(bool){
         if(block.timestamp >= maturityTime){
             return true;
@@ -37,36 +39,17 @@ contract LoanToken is ERC721 {
         }
     }
 
+    //transfer token
     function transferItem(address sender, address receiver, uint256 id) public returns (address){
             //isApprovedForAll(receiver, true);
             transferFrom(sender, receiver, id);
         return receiver;
     }
 
+    //allow others to operate the token
     function setApprove(address owner, address operator, bool approved) public{
             ApprovalForAll(owner, operator, approved);
     }
 }
 
-//contract LoanContract is IERC721Receiver {
-////    LoanToken token;
-////
-////    constructor() public{
-////        LoanToken newToken = new LoanToken();
-////    }
-//    function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
-//        return this.onERC721Received.selector;
-//    }
-//
-//    function getIssuer() public returns (address){
-//        return msg.sender;
-//    }
-//
-//    function createToken(LoanToken token, address sender) public{
-//        token.awardItem(sender);
-//    }
-//
-//    function transferToken(LoanToken token, address sender, address receiver, uint256 id) public{
-//        token.transferItem(sender, receiver, id);
-//    }
-//}
+

@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import 'antd/dist/antd.css';
 import '../../index.css';
-
+import moment from "moment";
 
 import {
     Checkbox,
@@ -62,8 +62,43 @@ console.log("account:" + acc);
 class IssuePage extends Component {
     constructor(props) {
         super(props);
-        this.state = {accounts: null}
+        this.state = {accounts: null, upgradeTime: null}
+
+
     }
+
+    range = (start, end) => {
+        const result = [];
+        for (let i = start; i <= end; i++) {
+            result.push(i);
+        }
+        console.log(result);
+        return result;
+    };
+    disabledDate = (current) => {
+        // cannot choose time before today
+        console.log(moment())
+        return current < moment()-172000;
+    };
+
+    disabledEndDate = (current) => {
+        // cannot choose time before tomorrow
+        console.log(moment())
+        return current < moment();
+    };
+
+    disabledDateTime = () => {
+        let hours = moment().hours();//0~23
+        let minutes = moment().minutes();//0~59
+        //can select time after now
+
+        if (this.state.upgradeTime.date() === moment().date()) {
+            return {
+                disabledHours: () => this.range(0, hours),
+                disabledMinutes: () => this.range(0, minutes),
+            };
+        }
+    };
 
     handle = (values) => {
         fetch('http://localhost:8888/issue', {
@@ -80,6 +115,7 @@ class IssuePage extends Component {
         }).catch(function (error) {
             console.log(error)
         })
+        //jump to a new page
         const jumpForm2 = document.createElement('form');
         document.body.appendChild(jumpForm2);
         jumpForm2.action = `/BondIssuing/IssueSuccess`;
@@ -256,7 +292,12 @@ class IssuePage extends Component {
                                                             },
                                                         ]}
                                                     >
-                                                        <DatePicker format={dataFormat}/>
+                                                        <DatePicker
+                                                            format={dataFormat}
+                                                            onChange={(upgradeTime) => this.setState({upgradeTime})}
+                                                            disabledDate={this.disabledDate}
+                                                            disabledTime={this.disabledDateTime}
+                                                        />
                                                     </Form.Item>
                                                 </Col>
                                                 <Col>
@@ -269,7 +310,11 @@ class IssuePage extends Component {
                                                             },
                                                         ]}
                                                     >
-                                                        <DatePicker format={dataFormat}/>
+                                                        <DatePicker
+                                                            format={dataFormat}
+                                                            onChange={(upgradeTime) => this.setState({upgradeTime})}
+                                                            disabledDate={this.disabledEndDate}
+                                                            disabledTime={this.disabledDateTime}/>
                                                     </Form.Item>
                                                 </Col>
                                                 <Col md={6} sm={24}></Col>

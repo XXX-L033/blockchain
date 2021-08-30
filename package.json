@@ -13,10 +13,6 @@
     "web3": "^1.3.5",
     "zeppelin-solidity": "^1.12.0"
   },
-  "engines":{
-    "node":"14.15.1",
-    "npm": "7.19.1"
-  },
   "devDependencies": {
     "dotenv": "^8.2.0"
   },
@@ -25,8 +21,6 @@
     "test": "test"
   },
   "scripts": {
-    "start": "node client/DBServer/server.js",
-    "heroku-postbuild": "cd client/ && npm cache clean --force && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -56,6 +56,7 @@ class CheckBond extends Component {
     }
 
 
+    //get bonds which regulator state = false
     getData = () => {
         $.ajax({
             url: 'http://localhost:8888/bond/regulator',
@@ -71,8 +72,10 @@ class CheckBond extends Component {
         })
     }
 
+    //update the state given by reviewer
     handleOk = async (values) => {
         values.regulator = true;
+        //if both are issuable - can be issued
         if(values.verifier == true){
             values.state = true
         }
@@ -81,7 +84,7 @@ class CheckBond extends Component {
         fetch(`http://127.0.0.1:8888/update`,{
             method:'post',
             headers: {
-                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Accept': 'application/json,text/plain,*/*',
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: 'message='+JSON.stringify(values),
@@ -102,6 +105,7 @@ class CheckBond extends Component {
         })
     };
 
+    //update feedback
     inputChange(e){
         this.setState({
             regulatorFeedback:e.target.value
@@ -117,10 +121,11 @@ class CheckBond extends Component {
 
         values.regulatorFeedback = this.state.regulatorFeedback
         console.log(values);
+        //update the database
         fetch(`http://127.0.0.1:8888/update`, {
             method: 'post',
             headers: {
-                'Accept': 'application/json,text/plain,*/*',/* 格式限制：json、文本、其他格式 */
+                'Accept': 'application/json,text/plain,*/*',//format
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: 'message=' + JSON.stringify(values),

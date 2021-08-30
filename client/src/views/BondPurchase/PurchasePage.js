@@ -68,6 +68,7 @@ class PurchasePage extends Component {
     }
 
 
+    //list bonds in listed
     getData = () => {
         $.ajax({
             url: 'http://localhost:8888/purchase',
@@ -90,6 +91,7 @@ class PurchasePage extends Component {
     };
 
 
+    //purchase bond, pay for bond
     issueBond = async (values) => {
         const {web3, account, investor, startDate, purchaseValue, maturityDate, loan} = this.state;
         //console.log(web3)
@@ -188,7 +190,7 @@ class PurchasePage extends Component {
         })
     }
 
-
+    //bond status
     getSpecificBond = (id, obj) => {
         this.setState({
             visible: true,
@@ -267,8 +269,8 @@ class PurchasePage extends Component {
                                     <p>Bond Symbol: {this.state.BSymbol}</p>
                                     <p>Bond Interest Rate: {this.state.coupon} %</p>
                                     <p>Bond URL: <a href={"http://" + this.state.url}>{this.state.url}</a></p>
-                                    <p>Bond Start Date: {new Date(this.state.startDate).toString().substr(0, 10)}</p>
-                                    <p>Bond Maturity Date: {new Date(this.state.maturityDate).toString().substr(0, 10)}</p>
+                                    <p>Bond Start Date: {this.state.startDate}</p>
+                                    <p>Bond Maturity Date: {this.state.maturityDate}</p>
                                     <p>Face Value: </p>
                                     <Select style={{width: 120}} defaultValue="Select ETH" onChange={this.handleChange}>
                                     {(this.state.faceValue || []).map((item, index) => {

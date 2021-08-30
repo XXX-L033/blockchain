@@ -64,6 +64,7 @@ class StateCheck extends Component {
     }
 
 
+    //show bond state
     getData = (acc) => {
         $.ajax({
             url: `http://localhost:8888/bond/${acc}`,
@@ -81,6 +82,7 @@ class StateCheck extends Component {
         })
     }
 
+    //show purchase requests
     getState = (acc) => {
         $.ajax({
             url: `http://localhost:3001/bond/${acc}`,
@@ -145,6 +147,7 @@ class StateCheck extends Component {
         })
     }
 
+    //return face value to investor at maturity date
     returnETH = async (obj) => {
         const {web3, loan} = this.state;
         let maturityDate = new Date(obj.maturityDate);
@@ -154,7 +157,6 @@ class StateCheck extends Component {
         //check whether end of period
         if (maturity == true) {
             let faceValue = obj.faceValue;
-            let coupon = obj.interestRate;
 
             $.ajax({
                 url: `http://localhost:8888/total/${acc}`,
@@ -177,6 +179,7 @@ class StateCheck extends Component {
 
                 web3.eth.sendTransaction({from: obj.account, to: obj.investor, value: toPay})
             } else {
+                //check whether is bankburky
                 console.log("n")
                 let perPerson = (balance - 100000000000000000) / (this.state.totalPerson);
                 web3.eth.sendTransaction({from: obj.account, to: obj.investor, value: perPerson})
@@ -202,11 +205,13 @@ class StateCheck extends Component {
         }
     }
 
+    //generate token and transfer to investor
     issue = async (obj) => {
         const {web3, loan, account} = this.state;
         let investor = obj.investor
         const contract = require('truffle-contract')
         console.log(web3)
+        //deploy the contract
         const loanToken = contract(LoanToken)
         loanToken.setProvider(web3.currentProvider)
         let date = new Date(obj.startDate);
@@ -223,12 +228,13 @@ class StateCheck extends Component {
                 console.log(instance);
                 if (id != 0) {
                     obj.tokenId = id;
-
+                    //start bonds transaction
                     obj.state = true;
 
                     instance.transferItem(acc, investor, id, {from: acc});
                     //sessionStorage.setItem(obj.tokenAddress,instance)
 
+                    //update "buyer" collection
                     fetch(`http://localhost:3001/update`, {
                         method: 'post',
                         headers: {
@@ -287,7 +293,12 @@ class StateCheck extends Component {
                 title: 'Issue State',
                 dataIndex: 'state',
                 key: 'state',
-                render: (state) => (state === true ? "true" : "false")
+                render: (state) => (state === true ? "true" : "false"),
+                filters: [
+                    {text: 'true', value: true},
+                    {text: 'false', value: false},
+                ],
+                onFilter: (value, record) => record.state === value,
             }
         ]
 

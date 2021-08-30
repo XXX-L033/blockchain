@@ -67,6 +67,7 @@ class BondState extends Component {
         }
     }
 
+    //get bonds from database that purchased by the investor
     getData = (investor) => {
         $.ajax({
             url: `http://localhost:3001/state/${investor}`,
@@ -97,6 +98,7 @@ class BondState extends Component {
         let instance = new web3.eth.Contract(LoanToken.abi,obj.tokenAddress);
         console.log(instance)
         let maturity = await loan.methods.checkEnd(maturityUnix).call();
+        //check whether bond matured, only can transfer when maturity
         if(maturity == true){
 
         instance.methods.transferItem(obj.investor, obj.account, obj.tokenId).send({from:obj.investor})
@@ -108,6 +110,7 @@ class BondState extends Component {
         }
     }
 
+    //sale to secondary market
     transferToken = async (obj) =>{
         obj.transfer = true;
 
@@ -130,13 +133,25 @@ class BondState extends Component {
         this.setState({
             visible: true,
             _id: id,
-            state:obj.state
+            state:obj.state,
+            BName: obj.BName,
+            name: obj.name,
+            type: obj.type,
+            interestRate:obj.interestRate,
+            coupon: obj.interestRate,
+            startDate: obj.startDate,
+            maturityDate: obj.maturityDate,
+            faceValue: obj.faceValue,
+            url: obj.url,
+            tokenAddress: obj.tokenAddress,
+            tokenId: obj.tokenId,
         })
         console.log(id)
         console.log(obj.tokenId)
         let maturityDate = new Date(obj.maturityDate);
         let maturityUnix = Math.floor(maturityDate.getTime() / 1000);
         let maturity = await loan.methods.checkEnd(maturityUnix).call();
+        //force to return the token if matured
         if(maturity == true){
             alert("This bond has come to the matured, please return back the token")
             this.setState({
@@ -200,20 +215,20 @@ class BondState extends Component {
                                 <Modal title="Bond Detail" visible={this.state.visible}
                                        cancelText="Cancel" onOk={this.handleCancel}
                                        onCancel={this.handleCancel}>
-                                        <p>Bond Name: {obj.BName}</p>
-                                        <p>Issuer Name: {obj.name}</p>
-                                    <p>Issuer Type: {obj.type === '1' ? 'Company' : 'Government'}</p>
-                                    <p>Bond Interest Rate: {obj.interestRate} %</p>
-                                    <p>Bond URL: <a href={"http://" + obj.url}>{obj.url}</a></p>
-                                    <p>Loan Address: {obj.tokenAddress}</p>
-                                    <p>Loan ID: {obj.tokenId}</p>
-                                    <p>Bond Start Date: {obj.startDate.toString().substr(0, 10)}</p>
-                                    <p>Bond Maturity Date: {obj.maturityDate.toString().substr(0, 10)}</p>
-                                    <p>Purchase Value: {obj.faceValue} ETH</p>
+                                        <p>Bond Name: {this.state.BName}</p>
+                                        <p>Issuer Name: {this.state.name}</p>
+                                    <p>Issuer Type: {this.state.type === '1' ? 'Company' : 'Government'}</p>
+                                    <p>Bond Interest Rate: {this.state.interestRate} %</p>
+                                    <p>Bond URL: <a href={"http://" + this.state.url}>{this.state.url}</a></p>
+                                    <p>Loan Address: {this.state.tokenAddress}</p>
+                                    <p>Loan ID: {this.state.tokenId}</p>
+                                    <p>Bond Start Date: {this.state.startDate}</p>
+                                    <p>Bond Maturity Date: {this.state.maturityDate}</p>
+                                    <p>Purchase Value: {this.state.faceValue} ETH</p>
                                 </Modal>
                                         </Col>
                                     <Col span={3}>
-                                <Button type="primary" disabled={obj.finish} onClick={()=>{this.returnToken(obj)}}>Transfer</Button>
+                                <Button type="primary" disabled={this.state.finish} onClick={()=>{this.returnToken(obj)}}>Transfer</Button>
                                         <Modal title="Alert" visible={this.state.textVisible} okText="Transfer" onOk={()=>this.transferToken(obj)}
                                         onCancel={this.handleCancel}>
                                             <p>This bond is not yet due, you can choose to hold it or transfer</p>

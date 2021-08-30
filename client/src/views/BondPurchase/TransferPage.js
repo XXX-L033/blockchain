@@ -67,6 +67,7 @@ class TransferPage extends Component {
     }
 
 
+    //get bonds in the secondary market
     getData = () => {
         $.ajax({
             url: 'http://localhost:3001/transfer',
@@ -82,6 +83,7 @@ class TransferPage extends Component {
         })
     }
 
+    //display the sub-modal
     handleOk = async (values) => {
         this.setState({
             textVisible: true,
@@ -89,6 +91,7 @@ class TransferPage extends Component {
     };
 
 
+    //transfer ETH to original investor
     transferOwnership = async (values) => {
         const {web3, account, investor, faceValue, loan} = this.state;
         //console.log(web3)
@@ -101,7 +104,7 @@ class TransferPage extends Component {
         if (maturity == false) {
             let balance = await web3.eth.getBalance(newInvestor.toString())
 
-            let paid = faceValue / (1 + values.coupon * 0.01) * 1000000000000000000;
+            let paid = faceValue / (1 + values.interestRate * 0.01) * 1000000000000000000;
 
             //check balance > need to pay, update 2 databases
             if (paid <= balance) {
@@ -156,7 +159,7 @@ class TransferPage extends Component {
         })
     }
 
-
+    //display specific bond detail
     getSpecificBond = (id, obj) => {
         this.setState({
             visible: true,
@@ -238,7 +241,7 @@ class TransferPage extends Component {
                                     <p>Bond URL: <a href={"http://" + this.state.url}>{this.state.url}</a></p>
                                     <p>Bond Start Date: {this.state.startDate}</p>
                                     <p>Bond Maturity Date: {this.state.maturityDate}</p>
-                                    <p>Face Value: {this.state.faceValue}</p>
+                                    <p>Face Value: {this.state.faceValue} ETH</p>
                                 </Modal>
                                  <Modal
                                      title="Ensure" visible={this.state.textVisible} onOk={() => {

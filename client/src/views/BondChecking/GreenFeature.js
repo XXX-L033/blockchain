@@ -54,6 +54,7 @@ class CheckBond extends Component {
     }
 
 
+    //get bond from db where verifier state = false
     getData = () => {
         $.ajax({
             url: 'http://localhost:8888/bond/verifier',
@@ -70,12 +71,14 @@ class CheckBond extends Component {
     }
 
     handleReady = async (values) => {
+        //update verifier state
         values.verifier = true;
         if(values.regulator == true){
             values.state = true
         }
         console.log(values)
 
+        //update whether bond can be issuable
         fetch(`http://127.0.0.1:8888/update`, {
             method: 'post',
             headers: {
@@ -105,6 +108,7 @@ class CheckBond extends Component {
         })
     };
 
+    //update feedback
     inputChange(e) {
         this.setState({
             verifierFeedback: e.target.value
@@ -118,6 +122,7 @@ class CheckBond extends Component {
         })
         values.verifierFeedback = this.state.verifierFeedback
         console.log(values);
+        //update feedback to database
         fetch(`http://127.0.0.1:8888/update`, {
             method: 'post',
             headers: {
@@ -139,6 +144,7 @@ class CheckBond extends Component {
         })
     }
 
+    //display specific bond detail
     getSpecificBond = (id, obj) => {
         this.setState({
             visible: true,
@@ -146,6 +152,7 @@ class CheckBond extends Component {
             name: obj.name,
             type: obj.type,
             url: obj.url,
+            account:obj.account,
             BSymbol: obj.BSymbol,
             regulator: obj.regulator,
             verifier: obj.verifier,
